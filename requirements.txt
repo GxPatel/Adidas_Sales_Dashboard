@@ -1,7 +1,4 @@
 streamlit
 plotly
-plotyl.express
 pandas
-os
-warnings
-plotly.figure_factory
+Numpy
