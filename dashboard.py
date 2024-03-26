@@ -26,10 +26,10 @@ endDate = pd.to_datetime(df["Invoice Date"]).max()
 
 col1, col2 = st.columns((2))
 with col1:
-    date1 = pd.to_datetime(st.date_input("Choose Start Date", startDate))
+    date1 = pd.to_datetime(st.date_input("Choose Start Date :date:", startDate))
 
 with col2:
-    date2 = pd.to_datetime(st.date_input("Choose End Date", endDate))
+    date2 = pd.to_datetime(st.date_input("Choose End Date :date:", endDate))
 
 df = df[(df["Invoice Date"] >= date1) & (df["Invoice Date"] <= date2)].copy()
 
