@@ -4,25 +4,29 @@ import pandas as pd
 import os
 import warnings
 import plotly.figure_factory as ff
+import calendar
 warnings.filterwarnings('ignore')
 
-
+# Page Styling
 st.set_page_config(page_title='Sales Dashboard', 
-                   page_icon=':chart_with_upwards_trend:', 
+                   page_icon=':chart_with_upwards_trend:',
+                   initial_sidebar_state='expanded', 
                    layout='wide')
 
-st.title(':bar_chart: Adidas Sales Dashboard (2020-2021)')
+# Dashboard Title
+st.title(':bar_chart: Adidas Sales Dashboard')
 vert_space = '<div style="padding: 10px 0px;"></div>'
 st.markdown(vert_space, unsafe_allow_html=True)
 
-# Reading the dataset
-df = pd.read_csv(r"AdidasSalesdata.csv", encoding="ISO-8859-1")
+# Reading data file
+df = pd.read_csv("AdidasSalesdata.csv", encoding = "ISO-8859-1")
+
+# Converting raw data column
 df["Invoice Date"] = pd.to_datetime(df["Invoice Date"])
 
 # Getting the min and max date 
 startDate = pd.to_datetime(df["Invoice Date"]).min()
 endDate = pd.to_datetime(df["Invoice Date"]).max()
-
 
 col1, col2 = st.columns((2))
 with col1:
@@ -34,41 +38,25 @@ with col2:
 df = df[(df["Invoice Date"] >= date1) & (df["Invoice Date"] <= date2)].copy()
 
 
-c1, c2, c3 = st.columns((3))
-with c1:
-    region = st.multiselect("Pick the Region(s)", df["Region"].unique())
-    if not region:
-        df2 = df.copy()
-    else:
-        df2 = df[df["Region"].isin(region)]
+# Filters picker
+st.sidebar.header("Choose your filters:")
 
-with c2:
-    state = st.multiselect("Pick the State(s)", df["State"].unique())
-    if not state:
-        df3 = df.copy()
-    else:
-        df3 = df[df["State"].isin(region)]
+# Dropdown for Region
+region = st.sidebar.multiselect("Pick the Region(s)", df["Region"].unique())
+if not region:
+    df2 = df.copy()
+else:
+    df2 = df[df["Region"].isin(region)]
 
-with c3:
-    city = st.multiselect("Pick the City(s)",df3["City"].unique())
+# Dropdown for State
+state = st.sidebar.multiselect("Pick the State(s)", df2["State"].unique())
+if not state:
+    df3 = df2.copy()
+else:
+    df3 = df2[df2["State"].isin(state)]
 
-# st.sidebar.header("Choose your filters:")
-# # Dropdown for Region
-# region = st.sidebar.multiselect("Pick the Region(s)", df["Region"].unique())
-# if not region:
-#     df2 = df.copy()
-# else:
-#     df2 = df[df["Region"].isin(region)]
-
-# # Dropdown for State
-# state = st.sidebar.multiselect("Pick the State(s)", df2["State"].unique())
-# if not state:
-#     df3 = df2.copy()
-# else:
-#     df3 = df2[df2["State"].isin(state)]
-
-# # Dropdown for City
-# city = st.sidebar.multiselect("Pick the City(s)",df3["City"].unique())
+# Dropdown for City
+city = st.sidebar.multiselect("Pick the City(s)",df3["City"].unique())
 
 # Filter the data based on Region, State and City
 if not region and not state and not city:
@@ -115,21 +103,12 @@ with cl1: # Sales Method vs. Sales pie chart
 
 
 with cl2: # Profit vs. Month_Year Line chart 
-    filtered_df['Invoice Date'] = pd.to_datetime(filtered_df['Invoice Date']) # Convert 'Invoice Date' to datetime
-    sales_by_date = filtered_df.groupby('Invoice Date')['Operating Profit'].sum().reset_index() # Aggregate total sales by invoice date
-    st.subheader('Time Series Analysis of Profit')
-    linechart = pd.DataFrame(sales_by_date)
-    fig2 = px.line(linechart, x = sales_by_date['Invoice Date'], y=sales_by_date["Operating Profit"], labels = {"Profit": "Sales"},
-                    height=500, width = 1000, template = "gridon")
+    st.subheader('Trend of Profit Over Time')
+    filtered_df['Invoice Date'] = pd.to_datetime(filtered_df['Invoice Date'])
+    sales_by_date = filtered_df.groupby(filtered_df['Invoice Date'].dt.to_period('M'))['Operating Profit'].sum().reset_index()
+    sales_by_date['Invoice Date'] = sales_by_date['Invoice Date'].dt.to_timestamp()
+    fig2 = px.line(sales_by_date, x='Invoice Date', y='Operating Profit', labels={'Invoice Date': 'Months', 'Operating Profit': 'Profit'}, template='gridon')
     st.plotly_chart(fig2,use_container_width=True)
-
-
-# Tree-map based on Region, and category
-st.subheader("Hierarchical view of Sales using TreeMap")
-fig3 = px.treemap(filtered_df, path = ["Region","Product Category"], values = "Total Sales",hover_data = ["Total Sales"],
-                  color = "Product Category")
-fig3.update_layout(width = 800, height = 650)
-st.plotly_chart(fig3, use_container_width=True)
 
 
 filtered_df.rename(columns={"ï»¿Retailer": "Retailer"}, inplace=True) # just for efficiency
@@ -151,13 +130,14 @@ with chart2: # Gender vs. sales pie chart
 st.subheader(":point_right: Monthly Category Sales")
 with st.expander("Expand to View Table"):
     filtered_df["month"] = filtered_df["Invoice Date"].dt.month_name()
-    category_Year = pd.pivot_table(data = filtered_df, values = "Total Sales", index = ["Product Category"], columns = "month")
+    months_chronological = [calendar.month_name[i] for i in range(1, 13)]
+    category_Year = pd.pivot_table(data=filtered_df, values='Total Sales', index=['Product Category'], columns='month', aggfunc='sum', fill_value=0)[months_chronological]
     st.write(category_Year.style.background_gradient(cmap="Blues"))
 
 
 # Scatter plot
 data1 = px.scatter(filtered_df, x = "Total Sales", y = "Operating Profit", size = "Units Sold")
-data1['layout'].update(title="Relationship between Sales and Profits using Scatter Plot",
+data1['layout'].update(title="Relationship between Sales and Profit",
                        titlefont = dict(size=20),xaxis = dict(title="Sales",titlefont=dict(size=19)),
                        yaxis = dict(title = "Profit", titlefont = dict(size=19)))
 st.plotly_chart(data1,use_container_width=True)
