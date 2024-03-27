@@ -5,6 +5,7 @@ import os
 import warnings
 import plotly.figure_factory as ff
 import calendar
+import matplotlib
 warnings.filterwarnings('ignore')
 
 # Page Styling
