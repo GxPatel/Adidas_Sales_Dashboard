@@ -151,3 +151,43 @@ with st.expander("Expand to View Raw Data"):
 # Download orginal DataSet
 csv = df.to_csv(index = False).encode('utf-8')
 st.download_button('Download Data', data = csv, file_name = "Data.csv",mime = "text/csv")
+
+
+footer = st.empty()
+footer.markdown(
+"""<style>
+a:link , a:visited{
+color: blue;
+background-color: transparent;
+text-decoration: underline;
+}
+
+a:hover,  a:active {
+color: red;
+background-color: transparent;
+text-decoration: underline;
+}
+
+.footer {
+position: sticky;
+bottom: 0;
+z-index: 1000;
+width: 100%;
+background-color: rgba(0,0,0,0);
+color: black;
+text-align: center
+}
+</style>
+<div class="footer">
+<p> © 2024 All rights reserved. <a style='display: block; text-align: center;' href="https://github.com/GxPatel" target="_blank"> GxPatel </a></p>
+</div>
+""",
+unsafe_allow_html=True)
+
+hide_st_style = """
+<style>
+footer: visibility: hidden;
+header: visibility: hidden;
+</style>
+"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
