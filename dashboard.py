@@ -107,8 +107,8 @@ with cl2: # Profit vs. Month_Year Line chart
     filtered_df['Invoice Date'] = pd.to_datetime(filtered_df['Invoice Date'])
     sales_by_date = filtered_df.groupby(filtered_df['Invoice Date'].dt.to_period('M'))['Operating Profit'].sum().reset_index()
     sales_by_date['Invoice Date'] = sales_by_date['Invoice Date'].dt.to_timestamp()
-    fig2 = px.line(sales_by_date, x='Invoice Date', y='Operating Profit', labels={'Invoice Date': 'Months', 'Operating Profit': 'Profit'}, template='gridon')
-    st.plotly_chart(fig2,use_container_width=True)
+    fig = px.line(sales_by_date, x='Invoice Date', y='Operating Profit', labels={'Invoice Date': 'Months', 'Operating Profit': 'Profit'}, template='gridon')
+    st.plotly_chart(fig,use_container_width=True)
 
 
 filtered_df.rename(columns={"ï»¿Retailer": "Retailer"}, inplace=True) # just for efficiency
@@ -136,11 +136,11 @@ with st.expander("Expand to View Table"):
 
 
 # Scatter plot
-data1 = px.scatter(filtered_df, x = "Total Sales", y = "Operating Profit", size = "Units Sold")
-data1['layout'].update(title="Relationship between Sales and Profit",
+fig = px.scatter(filtered_df, x = "Total Sales", y = "Operating Profit", size = "Units Sold")
+fig['layout'].update(title="Relationship between Sales and Profit",
                        titlefont = dict(size=20),xaxis = dict(title="Sales",titlefont=dict(size=19)),
                        yaxis = dict(title = "Profit", titlefont = dict(size=19)))
-st.plotly_chart(data1,use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 
 # Raw Data
