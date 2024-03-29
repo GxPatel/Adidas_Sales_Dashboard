@@ -173,7 +173,7 @@ position: sticky;
 bottom: 0;
 z-index: 1000;
 width: 100%;
-background-color: rgba(0,0,0,0);
+background-color: rgba(255,2555,255,35);
 color: black;
 text-align: center
 }
