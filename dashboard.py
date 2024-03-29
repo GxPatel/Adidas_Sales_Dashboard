@@ -15,12 +15,26 @@ st.set_page_config(page_title='Sales Dashboard',
                    layout='wide')
 
 # Dashboard Title
-st.title(':bar_chart: Adidas Sales Dashboard')
-vert_space = '<div style="padding: 10px 0px;"></div>'
-st.markdown(vert_space, unsafe_allow_html=True)
+st.write("### :bar_chart: Adidas Sales Dashboard")
+st.markdown(
+    """
+    <style>
+        section[data-testid="stSidebar"] {
+            width: 300px !important;
+        }
+        .block-container {
+                    padding-top: 3rem;
+                    padding-bottom: 2rem;
+        }
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+    </style>
+    """, 
+    unsafe_allow_html=True
+    )
 
 # Reading data file
-df = pd.read_csv("AdidasSalesdata.csv", encoding = "ISO-8859-1")
+df = pd.read_csv(r"C:\Users\gp158\Desktop\Projects\Adidas_Sales_Dashboard\AdidasSalesdata.csv", encoding = "ISO-8859-1")
 
 # Converting raw data column
 df["Invoice Date"] = pd.to_datetime(df["Invoice Date"])
@@ -29,18 +43,12 @@ df["Invoice Date"] = pd.to_datetime(df["Invoice Date"])
 startDate = pd.to_datetime(df["Invoice Date"]).min()
 endDate = pd.to_datetime(df["Invoice Date"]).max()
 
-col1, col2 = st.columns((2))
-with col1:
-    date1 = pd.to_datetime(st.date_input("Choose Start Date :date:", startDate))
-
-with col2:
-    date2 = pd.to_datetime(st.date_input("Choose End Date :date:", endDate))
-
-df = df[(df["Invoice Date"] >= date1) & (df["Invoice Date"] <= date2)].copy()
-
-
 # Filters picker
 st.sidebar.header("Choose your filters:")
+
+date1 = pd.to_datetime(st.sidebar.date_input("Choose Start Date:", startDate))
+date2 = pd.to_datetime(st.sidebar.date_input("Choose End Date:", endDate))
+df = df[(df["Invoice Date"] >= date1) & (df["Invoice Date"] <= date2)].copy()
 
 # Dropdown for Region
 region = st.sidebar.multiselect("Pick the Region(s)", df["Region"].unique())
@@ -79,69 +87,46 @@ else:
 
 category_df = filtered_df.groupby(by = ["Product Category"], as_index = False)["Total Sales"].sum()
 
-column1, column2 = st.columns((2))
+column1, column2, column3 = st.columns((3))
 with column1: # Category vs. Sales bar chart
-    st.subheader("Category wise Sales")
+    st.write("##### Category wise Sales")
+    #st.subheader("Category wise Sales", text_size="24px")
     fig = px.bar(category_df, x="Product Category", y="Total Sales", text=['${:,.2f}'.format(x) for x in category_df["Total Sales"]],
-                 template="simple_white")
-    st.plotly_chart(fig, use_container_width=True, height=200)
+                 template="simple_white", width=800, height=300)
+    st.plotly_chart(fig, use_container_width=True)
 
 with column2: # Region vs. Sales pie chart
-    st.subheader("Region wise Sales")
-    fig = px.pie(filtered_df, values = "Total Sales", names = "Region", hole = 0.5, template="seaborn")
+    st.write("##### Region wise Sales")
+    fig = px.pie(filtered_df, values = "Total Sales", names = "Region", hole = 0.5, template="seaborn", width=600, height=300)
     fig.update_traces(text = filtered_df["Region"], 
-                      textposition = "outside")
+                      textposition = "inside")
     st.plotly_chart(fig,use_container_width=True)
 
+with column3: # Sales Method vs. Sales pie chart
+    st.write("##### Sales Method wise Sales")
+    fig = px.pie(filtered_df, values = "Total Sales", names = "Sales Method", hole = 0.5, width=400, height=300)
+    fig.update_traces(text = filtered_df["Sales Method"], 
+                      textposition = "inside")
+    st.plotly_chart(fig,use_container_width=True)
 
 cl1, cl2 = st.columns((2))
-with cl1: # Sales Method vs. Sales pie chart
-    st.subheader("Sales Method wise Sales")
-    fig = px.pie(filtered_df, values = "Total Sales", names = "Sales Method", hole = 0.5)
-    fig.update_traces(text = filtered_df["Sales Method"], 
-                      textposition = "outside")
-    st.plotly_chart(fig,use_container_width=True)
 
-
-with cl2: # Profit vs. Month_Year Line chart 
-    st.subheader('Trend of Profit Over Time')
+with cl1: # Profit vs. Month_Year Line chart 
+    st.write('##### Trend of Profit Over Time')
     filtered_df['Invoice Date'] = pd.to_datetime(filtered_df['Invoice Date'])
     sales_by_date = filtered_df.groupby(filtered_df['Invoice Date'].dt.to_period('M'))['Operating Profit'].sum().reset_index()
     sales_by_date['Invoice Date'] = sales_by_date['Invoice Date'].dt.to_timestamp()
-    fig = px.line(sales_by_date, x='Invoice Date', y='Operating Profit', labels={'Invoice Date': 'Months', 'Operating Profit': 'Profit'}, template='gridon')
+    fig = px.line(sales_by_date, x='Invoice Date', y='Operating Profit', labels={'Invoice Date': 'Months - Years', 'Operating Profit': 'Profit (USD)'}, 
+                template='gridon', width=600, height=300)
     st.plotly_chart(fig,use_container_width=True)
-
 
 filtered_df.rename(columns={"ï»¿Retailer": "Retailer"}, inplace=True) # just for efficiency
-chart1, chart2 = st.columns((2))
-with chart1: # Retailer vs. sales pie chart
-    st.subheader('Retailer wise Sales')
-    fig = px.pie(filtered_df, values = "Total Sales", names = "Retailer", template = "plotly_dark")
+with cl2: # Retailer vs. sales pie chart
+    st.write('##### Retailer wise Sales')
+    fig = px.pie(filtered_df, values = "Total Sales", names = "Retailer", template = "plotly_dark", 
+                width=600, height=300)
     fig.update_traces(text = filtered_df["Retailer"], textposition = "outside")
     st.plotly_chart(fig,use_container_width=True)
-
-with chart2: # Gender vs. sales pie chart
-    st.subheader('Gender wise Sales')
-    fig = px.pie(filtered_df, values = "Total Sales", names = "Gender Type", template = "gridon")
-    fig.update_traces(text = filtered_df["Gender Type"], textposition = "outside")
-    st.plotly_chart(fig,use_container_width=True)
-
-
-# Summary table of monthly sales
-st.subheader(":point_right: Monthly Category Sales")
-with st.expander("Expand to View Table"):
-    filtered_df["month"] = filtered_df["Invoice Date"].dt.month_name()
-    months_chronological = [calendar.month_name[i] for i in range(1, 13)]
-    category_Year = pd.pivot_table(data=filtered_df, values='Total Sales', index=['Product Category'], columns='month', aggfunc='sum', fill_value=0)[months_chronological]
-    st.write(category_Year.style.background_gradient(cmap="Blues"))
-
-
-# Scatter plot
-fig = px.scatter(filtered_df, x = "Total Sales", y = "Operating Profit", size = "Units Sold")
-fig['layout'].update(title="Relationship between Sales and Profit",
-                       titlefont = dict(size=20),xaxis = dict(title="Sales",titlefont=dict(size=19)),
-                       yaxis = dict(title = "Profit", titlefont = dict(size=19)))
-st.plotly_chart(fig, use_container_width=True)
 
 
 # Raw Data
@@ -183,11 +168,3 @@ text-align: center
 </div>
 """,
 unsafe_allow_html=True)
-
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
