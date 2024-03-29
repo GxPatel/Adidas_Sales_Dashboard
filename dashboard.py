@@ -34,7 +34,7 @@ st.markdown(
     )
 
 # Reading data file
-df = pd.read_csv(r"C:\Users\gp158\Desktop\Projects\Adidas_Sales_Dashboard\AdidasSalesdata.csv", encoding = "ISO-8859-1")
+df = pd.read_csv("AdidasSalesdata.csv", encoding = "ISO-8859-1")
 
 # Converting raw data column
 df["Invoice Date"] = pd.to_datetime(df["Invoice Date"])
