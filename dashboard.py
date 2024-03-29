@@ -128,12 +128,12 @@ with chart2: # Gender vs. sales pie chart
 
 
 # Summary table of monthly sales
-st.subheader(":point_right: Monthly Category Sales")
-with st.expander("Expand to View Table"):
-    filtered_df["month"] = filtered_df["Invoice Date"].dt.month_name()
-    months_chronological = [calendar.month_name[i] for i in range(1, 13)]
-    category_Year = pd.pivot_table(data=filtered_df, values='Total Sales', index=['Product Category'], columns='month', aggfunc='sum', fill_value=0)[months_chronological]
-    st.write(category_Year.style.background_gradient(cmap="Blues"))
+#st.subheader(":point_right: Monthly Category Sales")
+#with st.expander("Expand to View Table"):
+#    filtered_df["month"] = filtered_df["Invoice Date"].dt.month_name()
+#    months_chronological = [calendar.month_name[i] for i in range(1, 13)]
+#    category_Year = pd.pivot_table(data=filtered_df, values='Total Sales', index=['Product Category'], columns='month', aggfunc='sum', fill_value=0)[months_chronological]
+#    st.write(category_Year.style.background_gradient(cmap="Blues"))
 
 
 # Scatter plot
