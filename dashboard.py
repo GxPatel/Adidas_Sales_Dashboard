@@ -128,6 +128,29 @@ with cl2: # Retailer vs. sales pie chart
     fig.update_traces(text = filtered_df["Retailer"], textposition = "outside")
     st.plotly_chart(fig,use_container_width=True)
 
+with chart2: # Gender vs. sales pie chart
+    st.subheader('Gender wise Sales')
+    fig = px.pie(filtered_df, values = "Total Sales", names = "Gender Type", template = "gridon")
+    fig.update_traces(text = filtered_df["Gender Type"], textposition = "outside")
+    st.plotly_chart(fig,use_container_width=True)
+
+
+# Summary table of monthly sales
+st.subheader(":point_right: Monthly Category Sales")
+with st.expander("Expand to View Table"):
+    filtered_df["month"] = filtered_df["Invoice Date"].dt.month_name()
+    months_chronological = [calendar.month_name[i] for i in range(1, 13)]
+    category_Year = pd.pivot_table(data=filtered_df, values='Total Sales', index=['Product Category'], columns='month', aggfunc='sum', fill_value=0)[months_chronological]
+    st.write(category_Year.style.background_gradient(cmap="Blues"))
+
+
+# Scatter plot
+fig = px.scatter(filtered_df, x = "Total Sales", y = "Operating Profit", size = "Units Sold")
+fig['layout'].update(title="Relationship between Sales and Profit",
+                       titlefont = dict(size=20),xaxis = dict(title="Sales",titlefont=dict(size=19)),
+                       yaxis = dict(title = "Profit", titlefont = dict(size=19)))
+st.plotly_chart(fig, use_container_width=True)
+
 
 # Raw Data
 with st.expander("Expand to View Raw Data"):
@@ -158,7 +181,7 @@ position: sticky;
 bottom: 0;
 z-index: 1000;
 width: 100%;
-background-color: rgba(0,0,0,0);
+background-color: rgba(255,2555,255,35);
 color: black;
 text-align: center
 }
@@ -168,3 +191,11 @@ text-align: center
 </div>
 """,
 unsafe_allow_html=True)
+
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
