@@ -22,7 +22,7 @@ Once users apply their desired filters, the dashboard updates to display relevan
 - Pie Chart: Displays sales distribution using a circular chart divided into segments.
 - Line Chart: Shows trends and patterns in sales over time using lines and markers.
 
-# How to Run:
+# How to Run
 Simply click on this link: https://adidas-sales-dashboard.streamlit.app/
 
 # Contributors
