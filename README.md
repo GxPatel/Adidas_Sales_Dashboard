@@ -24,3 +24,13 @@ Once users apply their desired filters, the dashboard updates to display relevan
 
 # How to Run:
 Simply click on this link: https://adidas-sales-dashboard.streamlit.app/
+
+# Contributors
+Goral Patel: Project Lead and Developer
+
+# Feedback and Contributions
+Feedback and contributions to this project are welcome! If you have suggestions, ideas, or improvements, please feel free to submit a pull request or open an issue on GitHub.
+
+Enjoy exploring the Adidas Sales Dashboard! If you have any questions or encounter issues, don't hesitate to reach out.
+
+##### Disclaimer: This project is not affiliated with Adidas or any associated brands. It is created for educational and demonstration purposes only.
